@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <termios.h>
 
 #define CAMERA_DEVICE "/dev/video0"
 #define RADAR_CFG "/dev/ttyACM0"
@@ -22,7 +23,7 @@ typedef struct _GstCustomSrc {
   int camera_fd;
   int radar_cfg_fd;
   int radar_data_fd;
-  std::vector char read_data_buffer;
+  char *read_data_buffer;
 } GstCustomSrc;
 
 typedef struct _GstCustomSrcClass {
@@ -34,8 +35,8 @@ G_DEFINE_TYPE (GstCustomSrc, gst_custom_src, GST_TYPE_PUSH_SRC);
 static gboolean gst_custom_src_start (GstBaseSrc * src);
 static gboolean gst_custom_src_stop (GstBaseSrc * src);
 static GstFlowReturn gst_custom_src_create (GstPushSrc * src, GstBuffer ** buf);
-static gboolean gst_custom_src_init_radar (GstBaseSrc * src);
-static void gst_custom_src_close_radar (GstBaseSrc * src);
+static gboolean gst_custom_src_init_radar (GstCustomSrc * src);
+static void gst_custom_src_close_radar (GstCustomSrc * src);
 
 static void
 gst_custom_src_class_init (GstCustomSrcClass * klass)
@@ -135,7 +136,7 @@ gst_custom_src_init_radar (GstCustomSrc * src)
     return FALSE;
   }
 
-  if (cfsetspeed(&tty, B115200) != 0) {
+  if (cfsetspeed(&tty, 115200) != 0) {
     GST_ERROR ("Error %i from cfsetspeed: %s", errno, strerror(errno));
     return FALSE;
   }
