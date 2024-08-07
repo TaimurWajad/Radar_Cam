@@ -11,6 +11,8 @@
 #define RADAR_DATA "/dev/ttyACM1"
 #define READ_BUF_SIZE 64000
 
+#define VERSION "1.0" // TODO: Check
+
 GST_DEBUG_CATEGORY_STATIC (gst_custom_src_debug);
 #define GST_CAT_DEFAULT gst_custom_src_debug
 
