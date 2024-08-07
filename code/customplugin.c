@@ -34,7 +34,7 @@ G_DEFINE_TYPE (GstCustomSrc, gst_custom_src, GST_TYPE_PUSH_SRC);
 
 static gboolean gst_custom_src_start (GstBaseSrc * src);
 static gboolean gst_custom_src_stop (GstBaseSrc * src);
-static GstFlowReturn gst_custom_src_create (GstPushSrc * src, GstBuffer ** buf);
+static GstFlowReturn gst_custom_src_create (GstPushSrc *src, GstBuffer **buf);
 static gboolean gst_custom_src_init_radar (GstCustomSrc * src);
 static void gst_custom_src_close_radar (GstCustomSrc * src);
 
@@ -174,27 +174,28 @@ gst_custom_src_init_radar (GstCustomSrc * src)
 
 
 static GstFlowReturn
-gst_custom_src_create (GstPushSrc  src, GstBuffer * buf)
+gst_custom_src_create (GstPushSrc *src, GstBuffer **buf)
 {
-  GstCustomSrc custom_src = (GstCustomSrc ) src;
+  GstCustomSrc *custom_src = (GstCustomSrc *) src;
   GstBuffer *buffer;
   GstMapInfo map;
   char read_buf[READ_BUF_SIZE];
-  int read_size;
+  ssize_t read_size; // Use ssize_t for read sizes
 
   // Read from radar data port
   read_size = read(custom_src->radar_data_fd, read_buf, sizeof(read_buf));
   if (read_size == -1) {
-    GST_ERROR ("Failed to read from radar data device: %s", strerror (errno));
+    GST_ERROR("Failed to read from radar data device: %s", strerror(errno));
     return GST_FLOW_ERROR;
   }
 
-  // Process radar data (example)
-  std::vector<char> &data = custom_src->radar_data_buffer;
-  data.insert(data.end(), read_buf, read_buf + read_size);
-
   // Create buffer to hold radar data
   buffer = gst_buffer_new_allocate(NULL, read_size, NULL);
+  if (!buffer) {
+    GST_ERROR("Failed to allocate GstBuffer");
+    return GST_FLOW_ERROR;
+  }
+
   gst_buffer_map(buffer, &map, GST_MAP_WRITE);
   memcpy(map.data, read_buf, read_size);
   gst_buffer_unmap(buffer, &map);
@@ -202,6 +203,7 @@ gst_custom_src_create (GstPushSrc  src, GstBuffer * buf)
   *buf = buffer;
   return GST_FLOW_OK;
 }
+
 
 static gboolean
 plugin_init (GstPlugin * plugin)
