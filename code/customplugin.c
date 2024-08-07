@@ -208,7 +208,7 @@ gst_custom_src_create (GstPushSrc *src, GstBuffer **buf)
 static gboolean
 plugin_init (GstPlugin * plugin)
 {
-  return gst_element_register (plugin, "customsrc", GST_RANK_NONE, GST_TYPE_CUSTOM_SRC);
+  return gst_element_register (plugin, "customsrc", GST_RANK_NONE, GST_TYPE_PUSH_SRC);
 }
 
 GST_PLUGIN_DEFINE (
