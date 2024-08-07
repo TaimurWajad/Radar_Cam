@@ -136,7 +136,7 @@ gst_custom_src_init_radar (GstCustomSrc * src)
     return FALSE;
   }
 
-  if (cfsetspeed(&tty, 115200) != 0) {
+  if (cfsetspeed(&tty, B115200) != 0) {
     GST_ERROR ("Error %i from cfsetspeed: %s", errno, strerror(errno));
     return FALSE;
   }
@@ -208,7 +208,7 @@ gst_custom_src_create (GstPushSrc *src, GstBuffer **buf)
 static gboolean
 plugin_init (GstPlugin * plugin)
 {
-  return gst_element_register (plugin, "customsrc", GST_RANK_NONE, GST_TYPE_PUSH_SRC);
+  return gst_element_register (plugin, "customsrc", GST_RANK_NONE, GST_TYPE_PUSH_SRC);//TODO:Check
 }
 
 GST_PLUGIN_DEFINE (
