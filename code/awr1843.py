@@ -2,13 +2,15 @@ import serial
 import time
 import RPi.GPIO as GPIO
 
-#pin definitions
-RADAR_PWR_EN = 16     # enable power to to radar
+# Pin definitions
+RADAR_PWR_EN = 16  # Enable power to radar
 
+# GPIO setup
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(RADAR_PWR_EN, GPIO.OUT)
 
-GPIO.output(RADAR_PWR_EN,GPIO.HIGH)   #DISABLE POWER TO ULTRA SENSORS
+# Enable power to radar
+GPIO.output(RADAR_PWR_EN, GPIO.HIGH)  # ENABLE POWER TO ULTRA SENSORS
 
 # UART configuration
 USER_UART_PORT = '/dev/ttyAMA4'  # UART port for AWR1843BOOST
@@ -35,18 +37,25 @@ def read_data(uart):
 
 # Main workflow
 if __name__ == "__main__":
-    # Open User UART
-    user_uart = serial.Serial(USER_UART_PORT, baudrate=USER_UART_BAUDRATE, timeout=1)
-    print(f"Connected to {USER_UART_PORT}")
+    try:
+        # Open User UART
+        user_uart = serial.Serial(USER_UART_PORT, baudrate=USER_UART_BAUDRATE, timeout=1)
+        print(f"Connected to {USER_UART_PORT}")
 
-    # Send radar configuration
-    print("Sending configuration...")
-    send_config(user_uart, "radar_config.cfg")
-    time.sleep(1)  # Wait for radar to initialize
+        # Send radar configuration
+        print("Sending configuration...")
+        send_config(user_uart, "radar_config.cfg")
+        time.sleep(1)  # Wait for radar to initialize
 
-    # Read radar data
-    print("Reading radar data...")
-    read_data(user_uart)
+        # Read radar data
+        print("Reading radar data...")
+        read_data(user_uart)
 
-    # Close UART
-    user_uart.close()
+    finally:
+        # Disable power to radar and cleanup GPIO
+        GPIO.output(RADAR_PWR_EN, GPIO.LOW)  # DISABLE POWER TO ULTRA SENSORS
+        GPIO.cleanup()
+        print("Radar powered OFF and GPIO cleaned up.")
+
+        # Close UART
+        user_uart.close()
