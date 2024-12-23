@@ -22,8 +22,9 @@ def send_config(uart, config_file):
         for line in file:
             if line.strip():
                 uart.write(line.encode())
-                print(f"Sent: {line.strip()}")
                 time.sleep(0.2)  # Small delay between commands
+                response = uart.read(uart.in_waiting).decode('utf-8', errors='ignore')  # Decode response
+                print(f"Sent: {line.strip()} | Response: {response}")
 
 def read_data(uart):
     """Read radar data from UART."""
@@ -31,7 +32,8 @@ def read_data(uart):
         while True:
             if uart.in_waiting:
                 data = uart.read(uart.in_waiting)
-                print(f"Data Received: {data.hex()}")  # Print raw data in hex
+                decoded_data = data.decode('utf-8', errors='ignore')
+                print(f"Data Received: {decoded_data}")  # Print decoded data
     except KeyboardInterrupt:
         print("Data reading stopped.")
 
