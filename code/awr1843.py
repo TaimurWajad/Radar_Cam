@@ -23,7 +23,7 @@ def send_config(uart, config_file):
             if line.strip():
                 uart.write(line.encode())
                 print(f"Sent: {line.strip()}")
-                time.sleep(0.1)  # Small delay between commands
+                time.sleep(0.2)  # Small delay between commands
 
 def read_data(uart):
     """Read radar data from UART."""
