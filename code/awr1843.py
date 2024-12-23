@@ -1,5 +1,14 @@
 import serial
 import time
+import RPi.GPIO as GPIO
+
+#pin definitions
+RADAR_PWR_EN = 16     # enable power to to radar
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(RADAR_PWR_EN, GPIO.OUT)
+
+GPIO.output(RADAR_PWR_EN,GPIO.HIGH)   #DISABLE POWER TO ULTRA SENSORS
 
 # UART configuration
 USER_UART_PORT = '/dev/ttyAMA4'  # UART port for AWR1843BOOST
